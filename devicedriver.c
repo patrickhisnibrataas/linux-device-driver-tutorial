@@ -17,3 +17,8 @@ static void __exit devicedriver_exit(void) {
 /*** Module ***/
 module_init(devicedriver_init);
 module_exit(devicedriver_exit);
+
+MODULE_LICENSE("GPL");
+MODULE_AUTHOR("Patrick Hisni Brataas <patrick@brataas.io>");
+MODULE_DESCRIPTION("A device driver where features are added step by step");
+MODULE_VERSION("1.0.0");
