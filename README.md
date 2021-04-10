@@ -17,3 +17,6 @@ One can pass arguments when loading a module. If there is an argument named `siz
 
 ## Feature #4 - Module parameter with a callback
 This is the same as Feature #3 with the addtional feature of being able to react to changes written to the parameter at run-time. It's possible to reimplement the getter and setter method.
+
+## Feature #5 - Dynamically allocate major and minor ID
+The major ID identifies the general class of device, and is used by the kernel to look up the appropriate driver for this type of device. The minor ID uniquely identifies a particular device within a general class, as there might be several devices using the same driver.
