@@ -5,6 +5,7 @@
 /*** Function prototypes ***/
 static void get_param_value(void);
 static void set_param_value(void);
+static void set_param_value_with_callback(void);
 
 bool read_line(char* file_path, char* buffer, size_t size);
 bool write_line(char* file_path, char* line);
@@ -26,6 +27,7 @@ int main()
         printf("0. exit program\n");
         printf("1. read param_value\n");
         printf("2. set param_value\n");
+        printf("3. set param_value_with_callback\n");
 
         printf("\n");
         scanf("%d",&cmd);
@@ -40,6 +42,9 @@ int main()
             break;
         case 2:
             set_param_value();
+            break;
+        case 3:
+            set_param_value_with_callback();
             break;
         default:
             printf("Invalid option entered\n");
@@ -68,6 +73,13 @@ static void set_param_value(void) {
     printf("Input value to write: ");
     scanf("%s",&value);
     write_line("/sys/module/devicedriver/parameters/parameter_value", &value[0]);
+}
+
+static void set_param_value_with_callback(void) {
+    char value[10];
+    printf("Input value to write: ");
+    scanf("%s",&value);
+    write_line("/sys/module/devicedriver/parameters/parameter_value_with_callback", &value[0]);
 }
 
 /*** Helper functions ***/
