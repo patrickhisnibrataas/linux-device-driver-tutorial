@@ -20,3 +20,6 @@ This is the same as Feature #3 with the addtional feature of being able to react
 
 ## Feature #5 - Dynamically allocate major and minor ID
 The major ID identifies the general class of device, and is used by the kernel to look up the appropriate driver for this type of device. The minor ID uniquely identifies a particular device within a general class, as there might be several devices using the same driver.
+
+## Feature #6 - Create a character device
+Create and register a character device to the system. The device will show as `/dev/devicedriver`.

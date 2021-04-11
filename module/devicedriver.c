@@ -1,5 +1,8 @@
+#include <linux/cdev.h>
+#include <linux/device.h>
 #include <linux/fs.h>
 #include <linux/init.h>
+#include <linux/kdev_t.h>
 #include <linux/kernel.h>
 #include <linux/kern_levels.h>
 #include <linux/module.h>
@@ -10,6 +13,7 @@
 static int parameter_value_with_callback_set(const char *val, const struct kernel_param *kp);
 static bool allocate_major_number(void);
 static void deallocate_major_number(void);
+static bool create_character_device(void);
 
 /*** Variables ***/
 static int parameter_value = 0;
@@ -19,6 +23,12 @@ const struct kernel_param_ops parameter_value_with_callback_ops = {
     .get = &param_get_int,
 };
 static dev_t dev = 0;
+static struct class *devicedriver_class;
+static struct cdev devicedriver_cdev;
+static struct file_operations fops =
+{
+    .owner          = THIS_MODULE
+};
 
 /*** Parameters ***/
 module_param(parameter_value, int, S_IRUGO|S_IWUSR);
@@ -30,12 +40,20 @@ static int __init devicedriver_init(void) {
         return -1;
     }
 
+    if (!create_character_device()) {
+        deallocate_major_number();
+        return -2;
+    }
+
     printk(KERN_INFO "Module loaded sucessfully\n");
     
     return 0;
 }
 
 static void __exit devicedriver_exit(void) {
+    device_destroy(devicedriver_class, dev);
+    class_destroy(devicedriver_class);
+    cdev_del(&devicedriver_cdev);
     deallocate_major_number();
     printk(KERN_INFO "Module removed\n");
 }
@@ -65,6 +83,28 @@ static bool allocate_major_number(void) {
 
 static void deallocate_major_number(void) {
     unregister_chrdev_region(dev, 1);
+}
+
+static bool create_character_device(void) {
+    cdev_init(&devicedriver_cdev, &fops);
+
+    if ((cdev_add(&devicedriver_cdev, dev, 1)) < 0) {
+        printk(KERN_INFO "Cannot add the character device to the system\n");
+        return false;
+    }
+
+    if ((devicedriver_class = class_create(THIS_MODULE, "devicedriver")) == NULL) {
+        printk(KERN_INFO "Can not create the struct class for device\n");
+        return false;
+    }
+
+    if ((device_create(devicedriver_class, NULL, dev, NULL, "devicedriver")) == NULL) {
+        printk(KERN_INFO "Cannot create the Device\n");
+        class_destroy(devicedriver_class);
+        return false;
+    }
+
+    return true;
 }
 
 /*** Module ***/
